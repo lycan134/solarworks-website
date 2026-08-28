@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
+import { MessageCircle, X } from "lucide-react";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ type: "user" | "assistant"; text: string }[]>([
     {
       type: "assistant",
-      text: "Hi! 👋 I'm the Solarworks AI Assistant. I can help you with questions about solar energy, our services, system types, and more. How can I help today?",
+      text: "Hi! I'm the Solarworks AI Assistant. I can help you with questions about solar energy, our services, system types, and more. How can I help today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -71,7 +72,8 @@ export default function ChatWidget() {
         className="fixed bottom-24 right-6 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-full shadow-xl transition-all duration-200 font-semibold flex items-center gap-2 z-40"
         aria-label="Open chat"
       >
-        💬 Chat AI
+        <MessageCircle size={20} />
+        Chat AI
       </button>
 
       {/* Chat Panel */}
@@ -88,7 +90,7 @@ export default function ChatWidget() {
               className="text-white hover:bg-green-700 p-2 rounded-full transition-colors"
               aria-label="Close chat"
             >
-              ✕
+              <X size={20} />
             </button>
           </div>
 

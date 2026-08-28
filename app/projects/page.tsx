@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { MapPin, Zap, Wrench, BarChart3, Home } from "lucide-react";
 
 export default function ProjectsPage() {
   const projects = [

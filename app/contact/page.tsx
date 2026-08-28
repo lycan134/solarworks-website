@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
+import { Phone, Mail, MapPin, Check, MessageCircle } from "lucide-react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -46,7 +47,7 @@ export default function ContactPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
-                      <span className="text-2xl">📞</span>
+                      <Phone size={20} className="text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900">Phone</h3>
@@ -62,7 +63,7 @@ export default function ContactPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
-                      <span className="text-2xl">📧</span>
+                      <Mail size={20} className="text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900">Email</h3>
@@ -78,7 +79,7 @@ export default function ContactPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
-                      <span className="text-2xl">📍</span>
+                      <MapPin size={20} className="text-green-600" />
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900">Location</h3>
@@ -114,8 +115,9 @@ export default function ContactPage() {
 
                 {submitted && (
                   <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6">
-                    <p className="text-green-700 font-semibold text-center">
-                      ✓ Thank you for reaching out! We'll get back to you as soon as possible.
+                    <p className="text-green-700 font-semibold text-center flex items-center justify-center gap-2">
+                      <Check size={20} />
+                      Thank you for reaching out! We'll get back to you as soon as possible.
                     </p>
                   </div>
                 )}
@@ -183,8 +185,9 @@ export default function ContactPage() {
                       Visit FAQ
                     </button>
                   </Link>
-                  <p className="text-xs text-gray-600 flex items-center">
-                    💬 Try our AI Assistant - available 24/7
+                  <p className="text-xs text-gray-600 flex items-center gap-1">
+                    <MessageCircle size={14} />
+                    Try our AI Assistant - available 24/7
                   </p>
                 </div>
               </div>

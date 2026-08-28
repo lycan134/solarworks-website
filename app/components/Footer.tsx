@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -79,14 +80,14 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex gap-2">
-                <span>📞</span>
+              <li className="flex gap-2 items-center">
+                <Phone size={16} className="text-gray-400" />
                 <a href="tel:09991234567" className="hover:text-green-400 transition-colors">
                   0999-123-4567
                 </a>
               </li>
-              <li className="flex gap-2">
-                <span>📧</span>
+              <li className="flex gap-2 items-center">
+                <Mail size={16} className="text-gray-400" />
                 <a
                   href="mailto:solarbusiness@email.com"
                   className="hover:text-green-400 transition-colors"
@@ -94,8 +95,8 @@ export default function Footer() {
                   solarbusiness@email.com
                 </a>
               </li>
-              <li className="flex gap-2">
-                <span>📍</span>
+              <li className="flex gap-2 items-center">
+                <MapPin size={16} className="text-gray-400" />
                 <span>Dipolog City, Philippines</span>
               </li>
             </ul>

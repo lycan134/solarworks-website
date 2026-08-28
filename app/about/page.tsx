@@ -1,7 +1,23 @@
 import Link from "next/link";
 import React from "react";
+import { Users, Wrench, Heart, Handshake, DollarSign, Star, TrendingUp } from "lucide-react";
 
 export default function AboutPage() {
+  // Helper function to render icons
+  const renderIcon = (iconName: string, size: number = 32) => {
+    const iconProps = { size, strokeWidth: 1.8 };
+    const icons: { [key: string]: React.ReactNode } = {
+      "Users": <Users {...iconProps} />,
+      "Wrench": <Wrench {...iconProps} />,
+      "Heart": <Heart {...iconProps} />,
+      "Handshake": <Handshake {...iconProps} />,
+      "DollarSign": <DollarSign {...iconProps} />,
+      "Star": <Star {...iconProps} />,
+      "TrendingUp": <TrendingUp {...iconProps} />,
+    };
+    return icons[iconName] || null;
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-800">
       {/* Hero Section */}
@@ -50,44 +66,44 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               {
-                icon: "👥",
+                icon: "Users",
                 title: "Expert Team",
                 description:
                   "Our certified and experienced installation team brings years of expertise in designing and installing solar systems.",
               },
               {
-                icon: "🔧",
+                icon: "Wrench",
                 title: "Custom Solutions",
                 description:
                   "We design every system specifically for your property, energy needs, and budget. No cookie-cutter approaches.",
               },
               {
-                icon: "💎",
+                icon: "Heart",
                 title: "Quality Components",
                 description:
                   "We use reliable, durable solar equipment and inverters from trusted manufacturers for long-lasting performance.",
               },
               {
-                icon: "🤝",
+                icon: "Handshake",
                 title: "Long-Term Support",
                 description:
                   "Your installation doesn't end on day one. We provide ongoing monitoring, maintenance, and support services.",
               },
               {
-                icon: "💰",
+                icon: "DollarSign",
                 title: "Transparent Pricing",
                 description:
                   "No hidden fees. We provide clear, detailed quotes and explain every aspect of your system before installation.",
               },
               {
-                icon: "🌍",
+                icon: "Star",
                 title: "Sustainability Focus",
                 description:
                   "We're passionate about renewable energy and helping customers reduce their carbon footprint while saving money.",
               },
             ].map((value, i) => (
               <div key={i} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                <div className="text-4xl mb-4">{value.icon}</div>
+                <div className="text-green-600 mb-4 flex">{renderIcon(value.icon, 40)}</div>
                 <h3 className="text-xl font-bold mb-3">{value.title}</h3>
                 <p className="text-gray-700">{value.description}</p>
               </div>

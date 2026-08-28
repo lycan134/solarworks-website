@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Check, Zap, BarChart3, Phone, Mail } from "lucide-react";
 
 export default function QuotePage() {
   const [form, setForm] = useState({
@@ -13,6 +14,17 @@ export default function QuotePage() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+
+  // Helper function to render icons
+  const renderIcon = (iconName: string, size: number = 32) => {
+    const iconProps = { size, strokeWidth: 1.8 };
+    const icons: { [key: string]: React.ReactNode } = {
+      "Check": <Check {...iconProps} />,
+      "Zap": <Zap {...iconProps} />,
+      "BarChart3": <BarChart3 {...iconProps} />,
+    };
+    return icons[iconName] || null;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -47,12 +59,12 @@ export default function QuotePage() {
           {/* Benefits */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {[
-              { icon: "✓", title: "Free Consultation", desc: "No cost, no obligation" },
-              { icon: "⚡", title: "Custom Design", desc: "Tailored to your needs" },
-              { icon: "📊", title: "Detailed Analysis", desc: "Energy savings estimate" },
+              { icon: "Check", title: "Free Consultation", desc: "No cost, no obligation" },
+              { icon: "Zap", title: "Custom Design", desc: "Tailored to your needs" },
+              { icon: "BarChart3", title: "Detailed Analysis", desc: "Energy savings estimate" },
             ].map((item, i) => (
               <div key={i} className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{item.icon}</div>
+                <div className="text-green-600 mb-2 flex justify-center">{renderIcon(item.icon, 32)}</div>
                 <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
                 <p className="text-sm text-gray-600">{item.desc}</p>
               </div>
@@ -63,8 +75,9 @@ export default function QuotePage() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-10">
             {submitted && (
               <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6">
-                <p className="text-green-700 font-semibold text-center">
-                  ✓ Thank you! We received your request. Our solar specialists will contact you within 24 hours to discuss your solar options.
+                <p className="text-green-700 font-semibold text-center flex items-center justify-center gap-2">
+                  <Check size={20} />
+                  Thank you! We received your request. Our solar specialists will contact you within 24 hours to discuss your solar options.
                 </p>
               </div>
             )}
@@ -206,10 +219,10 @@ export default function QuotePage() {
             <p className="text-gray-600 mb-4">Prefer to speak directly?</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="tel:09991234567" className="flex items-center justify-center gap-2 text-green-600 font-semibold hover:text-green-700">
-                <span>📞</span> Call: 0999-123-4567
+                <Phone size={20} /> Call: 0999-123-4567
               </a>
               <a href="mailto:solarbusiness@email.com" className="flex items-center justify-center gap-2 text-green-600 font-semibold hover:text-green-700">
-                <span>📧</span> Email: solarbusiness@email.com
+                <Mail size={20} /> Email: solarbusiness@email.com
               </a>
             </div>
           </div>

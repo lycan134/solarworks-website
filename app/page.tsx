@@ -2,10 +2,27 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Zap, Battery, Home, Wrench, Settings, Heart, Users, Check, ArrowRight, MapPin, MessageCircle } from "lucide-react";
 
 export default function HomePage() {
   const [estimatorInput, setEstimatorInput] = useState("");
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  // Helper function to render icons
+  const renderIcon = (iconName: string, size: number = 24) => {
+    const iconProps = { size, strokeWidth: 1.8 };
+    const icons: { [key: string]: React.ReactNode } = {
+      "Zap": <Zap {...iconProps} />,
+      "Battery": <Battery {...iconProps} />,
+      "Home": <Home {...iconProps} />,
+      "Wrench": <Wrench {...iconProps} />,
+      "Settings": <Settings {...iconProps} />,
+      "Heart": <Heart {...iconProps} />,
+      "Users": <Users {...iconProps} />,
+      "Check": <Check {...iconProps} />,
+    };
+    return icons[iconName] || null;
+  };
 
   const faqs = [
     {
@@ -33,7 +50,7 @@ export default function HomePage() {
   const solutionTypes = [
     {
       title: "Grid-Tie Solar",
-      icon: "⚡",
+      icon: "Zap",
       description: "Connected to the utility grid",
       who: "Homeowners and businesses with grid access",
       benefits: ["Lower electricity bills", "Net metering potential", "Simple installation"],
@@ -42,7 +59,7 @@ export default function HomePage() {
     },
     {
       title: "Hybrid Solar",
-      icon: "🔋",
+      icon: "Battery",
       description: "Grid-connected with battery backup",
       who: "Those seeking grid reliability with backup power",
       benefits: ["24/7 power availability", "Grid independence", "Best of both worlds"],
@@ -51,7 +68,7 @@ export default function HomePage() {
     },
     {
       title: "Off-Grid Solar",
-      icon: "🏡",
+      icon: "Home",
       description: "Fully independent power system",
       who: "Remote properties or complete energy independence",
       benefits: ["Complete independence", "Ideal for remote areas", "No utility bills"],
@@ -140,16 +157,16 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-center mb-12">Why Choose Solarworks</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "🛠️", title: "Professional Installation", desc: "Expert, certified installation team" },
-              { icon: "⚙️", title: "Custom System Design", desc: "Tailored solutions for your needs" },
-              { icon: "💎", title: "Quality Components", desc: "Reliable, durable solar equipment" },
-              { icon: "🤝", title: "Ongoing Support", desc: "Maintenance and support services" },
+              { icon: "Wrench", title: "Professional Installation", desc: "Expert, certified installation team" },
+              { icon: "Settings", title: "Custom System Design", desc: "Tailored solutions for your needs" },
+              { icon: "Heart", title: "Quality Components", desc: "Reliable, durable solar equipment" },
+              { icon: "Users", title: "Ongoing Support", desc: "Maintenance and support services" },
             ].map((item, i) => (
               <div
                 key={i}
                 className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center border border-gray-100"
               >
-                <div className="text-4xl mb-3">{item.icon}</div>
+                <div className="text-5xl mb-3 flex justify-center text-green-600">{renderIcon(item.icon, 32)}</div>
                 <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                 <p className="text-gray-600 text-sm">{item.desc}</p>
               </div>
@@ -168,7 +185,7 @@ export default function HomePage() {
                 key={i}
                 className={`bg-gradient-to-br ${solution.color} border-2 ${solution.borderColor} rounded-2xl p-8 hover:shadow-lg transition-all duration-200`}
               >
-                <div className="text-5xl mb-4">{solution.icon}</div>
+                <div className="text-green-600 mb-4">{renderIcon(solution.icon, 48)}</div>
                 <h3 className="text-2xl font-bold mb-2">{solution.title}</h3>
                 <p className="text-gray-700 mb-4 font-medium">{solution.description}</p>
                 <div className="mb-6 pb-6 border-b border-gray-300">
@@ -179,7 +196,8 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   {solution.benefits.map((benefit, j) => (
                     <li key={j} className="flex items-center gap-2 text-gray-700">
-                      <span className="text-green-600 font-bold">✓</span> {benefit}
+                      <Check size={16} className="text-green-600 flex-shrink-0" />
+                      {benefit}
                     </li>
                   ))}
                 </ul>
@@ -254,8 +272,8 @@ export default function HomePage() {
                 <h3 className="font-bold text-lg mb-2">{step.title}</h3>
                 <p className="text-gray-600 text-sm">{step.description}</p>
                 {i < processSteps.length - 1 && (
-                  <div className="hidden md:block absolute right-0 top-10 text-gray-300 text-2xl -mr-6">
-                    →
+                  <div className="hidden md:block absolute right-0 top-10 text-gray-300 -mr-6">
+                    <ArrowRight size={24} />
                   </div>
                 )}
               </div>
@@ -301,7 +319,10 @@ export default function HomePage() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-1">{project.title}</h3>
-                  <p className="text-gray-500 text-sm mb-4">📍 {project.location}</p>
+                  <p className="text-gray-500 text-sm mb-4 flex items-center gap-1">
+                    <MapPin size={16} />
+                    {project.location}
+                  </p>
                   <p className="text-gray-700">{project.description}</p>
                 </div>
               </div>
@@ -346,8 +367,9 @@ export default function HomePage() {
             Use our AI Solar Assistant to get instant answers about solar energy, system types, installation, and more.
           </p>
           <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-blue-200">
-            <p className="text-gray-600 mb-6">
-              💬 Click the chat icon in the bottom-right corner to start a conversation with our AI assistant.
+            <p className="text-gray-600 mb-6 flex items-center justify-center gap-2">
+              <MessageCircle size={20} className="text-blue-600" />
+              Click the chat icon in the bottom-right corner to start a conversation with our AI assistant.
             </p>
             <p className="text-sm text-gray-500">
               Available 24/7 • No appointment needed • Quick responses to common questions

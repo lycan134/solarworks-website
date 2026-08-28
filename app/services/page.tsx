@@ -1,10 +1,25 @@
 import Link from "next/link";
 import React from "react";
+import { Zap, Home, Battery, RefreshCw, Search, Handshake, Check } from "lucide-react";
 
 export default function ServicesPage() {
+  // Helper function to render icons
+  const renderIcon = (iconName: string, size: number = 48) => {
+    const iconProps = { size, strokeWidth: 1.8 };
+    const icons: { [key: string]: React.ReactNode } = {
+      "Zap": <Zap {...iconProps} />,
+      "Home": <Home {...iconProps} />,
+      "Battery": <Battery {...iconProps} />,
+      "RefreshCw": <RefreshCw {...iconProps} />,
+      "Search": <Search {...iconProps} />,
+      "Handshake": <Handshake {...iconProps} />,
+    };
+    return icons[iconName] || null;
+  };
+
   const services = [
     {
-      icon: "⚡",
+      icon: "Zap",
       title: "Grid-Tie Solar Installation",
       desc: "Connect your solar panels to the utility grid and lower your electricity bills effectively. Perfect for homeowners and businesses with grid access.",
       details: [
@@ -15,7 +30,7 @@ export default function ServicesPage() {
       ],
     },
     {
-      icon: "🏡",
+      icon: "Home",
       title: "Off-Grid Solar Systems",
       desc: "Ideal for remote areas without grid access or those seeking complete energy independence. Fully autonomous power system with battery storage.",
       details: [
@@ -26,7 +41,7 @@ export default function ServicesPage() {
       ],
     },
     {
-      icon: "🔋",
+      icon: "Battery",
       title: "Hybrid Solar Solutions",
       desc: "Combine grid reliability with battery backup for continuous power supply. The best of both worlds for maximum flexibility and security.",
       details: [
@@ -37,7 +52,7 @@ export default function ServicesPage() {
       ],
     },
     {
-      icon: "🧹",
+      icon: "RefreshCw",
       title: "Solar Panel Cleaning & Maintenance",
       desc: "Ensure optimal efficiency and longevity of your solar system with regular professional maintenance and cleaning services.",
       details: [
@@ -48,7 +63,7 @@ export default function ServicesPage() {
       ],
     },
     {
-      icon: "🔍",
+      icon: "Search",
       title: "Site Inspection & System Design",
       desc: "Custom system design based on your property, energy needs, and budget. Professional assessment to maximize your solar potential.",
       details: [
@@ -59,7 +74,7 @@ export default function ServicesPage() {
       ],
     },
     {
-      icon: "🤝",
+      icon: "Handshake",
       title: "Ongoing Support & Monitoring",
       desc: "Comprehensive support after installation including system monitoring, troubleshooting, and technical assistance.",
       details: [
@@ -93,7 +108,7 @@ export default function ServicesPage() {
                 className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200"
               >
                 <div className="bg-gradient-to-br from-green-50 to-blue-50 p-8 text-center">
-                  <div className="text-5xl mb-4">{service.icon}</div>
+                  <div className="text-green-600 mb-4 flex justify-center">{renderIcon(service.icon, 48)}</div>
                   <h2 className="text-xl font-bold text-gray-900">{service.title}</h2>
                 </div>
 
@@ -105,7 +120,7 @@ export default function ServicesPage() {
                     <ul className="space-y-2">
                       {service.details.map((detail, j) => (
                         <li key={j} className="flex items-start gap-3 text-sm text-gray-700">
-                          <span className="text-green-500 font-bold mt-1">✓</span>
+                          <Check size={16} className="text-green-500 flex-shrink-0 mt-0.5" />
                           <span>{detail}</span>
                         </li>
                       ))}
