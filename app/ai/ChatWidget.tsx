@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, X } from "lucide-react";
+import { MessageCircle, X, Send } from "lucide-react";
+
+type Message = {
+  role: "user" | "assistant";
+  text: string;
+};
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
 
-  const [messages, setMessages] = useState<
-    { type: "user" | "assistant"; text: string }[]
-  >([
+  const [messages, setMessages] = useState<Message[]>([
     {
-      type: "assistant",
-      text: "Hi! I'm the Solarworks AI Assistant. I can help you with questions about solar energy, our services, system types, and more. How can I help today?",
+      role: "assistant",
+      text: "Hi! I'm the Solarworks AI Assistant. I can answer questions about solar energy, our systems, services, and getting a quote. How can I help?",
     },
   ]);
 
@@ -20,69 +23,95 @@ export default function ChatWidget() {
 
   const quickReplies = [
     "How does solar work?",
-    "What's the difference between systems?",
-    "What info do you need for a quote?",
-    "Talk to a specialist",
+    "What's the difference between grid-tie and hybrid?",
+    "How much does solar cost?",
+    "I want a free quote",
   ];
 
-  const getSampleResponses: { [key: string]: string } = {
-    "how does solar work":
-      "Solar panels convert sunlight into electricity through the photovoltaic effect. The inverter converts DC power to AC power for your home. In grid-tie systems, excess energy can be sent back to the grid. In off-grid systems, energy is stored in batteries for later use.",
+  const handleSendMessage = async (messageText?: string) => {
+    const text = (messageText ?? input).trim();
 
-    "what's the difference":
-      "Grid-Tie: Connected to the utility grid and designed to reduce electricity bills. Off-Grid: Completely independent and ideal for remote areas. Hybrid: Combines grid connection with battery backup for greater energy security. Each system is suited to different needs and budgets.",
-
-    "what info do you need":
-      "For a quote, we typically need your current electricity bill, property location, roof condition, available roof space, and your energy goals. This helps our team design a system suited to your property. Would you like to request a professional consultation?",
-
-    "talk to a specialist":
-      "Great! You can reach our team at 0999-123-4567 or email solarbusiness@email.com. You can also click 'Get a Free Quote' on our website to request a consultation directly. Our specialists will respond within 24 hours!",
-  };
-
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
+    if (!text || isLoading) {
+      return;
+    }
 
     setInput("");
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        type: "user",
-        text: userMessage,
-      },
-    ]);
+    const userMessage: Message = {
+      role: "user",
+      text,
+    };
 
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const lowerInput = userMessage.toLowerCase();
+    try {
+      // Send message to our Next.js API route
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: text,
+        }),
+      });
 
-      let response =
-        "Thanks for your question! For more detailed information, please reach out to our team at 0999-123-4567 or use our quote form. Is there anything else I can help with?";
+      // Read response as text first so we can see
+      // the actual server response if something goes wrong.
+      const rawResponse = await response.text();
 
-      for (const [key, value] of Object.entries(getSampleResponses)) {
-        if (lowerInput.includes(key)) {
-          response = value;
-          break;
-        }
+      console.log("API status:", response.status);
+      console.log("API response:", rawResponse);
+
+      let data;
+
+      try {
+        data = JSON.parse(rawResponse);
+      } catch {
+        throw new Error(
+          `The API returned invalid JSON: ${rawResponse}`
+        );
       }
+
+      // Handle API errors
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            `API request failed with status ${response.status}`
+        );
+      }
+
+      // Our API route should return:
+      // { reply: "Gemini response..." }
+      if (!data.reply) {
+        throw new Error(
+          "The API response did not contain a reply."
+        );
+      }
+
+      // Add Gemini's response to the chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: data.reply,
+        },
+      ]);
+    } catch (error) {
+      console.error("Chat error:", error);
 
       setMessages((prev) => [
         ...prev,
         {
-          type: "assistant",
-          text: response,
+          role: "assistant",
+          text:
+            "Sorry, I'm having trouble connecting to the Solarworks AI service right now. Please try again in a moment or contact our team directly.",
         },
       ]);
-
+    } finally {
       setIsLoading(false);
-    }, 500);
-  };
-
-  const handleQuickReply = (reply: string) => {
-    setInput(reply);
+    }
   };
 
   return (
@@ -92,74 +121,68 @@ export default function ChatWidget() {
       ===================================================== */}
 
       <button
-        onClick={() => setOpen(!open)}
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label={open ? "Close chat" : "Open chat"}
         className="
           fixed
-          bottom-5
+          bottom-6
           right-4
-          sm:bottom-6
-          sm:right-6
-          z-40
+          z-50
           flex
           items-center
-          justify-center
           gap-2
           rounded-full
-          bg-green-500
+          bg-green-600
           px-4
           py-3
-          sm:px-5
-          sm:py-3
-          text-sm
-          sm:text-base
           font-semibold
           text-white
           shadow-xl
-          transition-all
-          duration-200
-          hover:bg-green-600
-          hover:scale-105
+          transition
+          hover:bg-green-700
+          sm:right-6
+          sm:px-5
         "
-        aria-label={open ? "Close chat" : "Open chat"}
       >
-        {open ? <X size={20} /> : <MessageCircle size={20} />}
+        {open ? (
+          <X size={20} />
+        ) : (
+          <MessageCircle size={20} />
+        )}
 
-        <span>{open ? "Close" : "Chat AI"}</span>
+        <span className="hidden sm:inline">
+          {open ? "Close" : "Chat AI"}
+        </span>
       </button>
 
       {/* =====================================================
-          CHAT PANEL
+          CHAT WINDOW
       ===================================================== */}
 
       {open && (
         <div
           className="
             fixed
+            inset-x-3
+            bottom-20
             z-50
-
-            /* Mobile */
-            left-4
-            right-4
-            bottom-4
-            w-auto
-            h-[calc(100vh-6rem)]
-            max-h-[700px]
-
-            /* Desktop */
-            sm:left-auto
-            sm:right-6
-            sm:bottom-6
-            sm:w-96
-            sm:h-[500px]
-
             flex
+            h-[70vh]
+            max-h-[650px]
             flex-col
             overflow-hidden
             rounded-2xl
             border
-            border-gray-200
+            border-slate-200
             bg-white
             shadow-2xl
+
+            sm:inset-x-auto
+            sm:bottom-20
+            sm:right-6
+            sm:h-[600px]
+            sm:w-[400px]
           "
         >
           {/* =================================================
@@ -173,112 +196,123 @@ export default function ChatWidget() {
               items-center
               justify-between
               bg-gradient-to-r
-              from-green-500
-              to-green-600
+              from-green-600
+              to-green-500
               px-4
-              py-3
-              sm:p-4
+              py-4
               text-white
             "
           >
-            <div className="min-w-0">
-              <h2 className="truncate text-base sm:text-lg font-bold">
-                Solarworks AI Assistant
-              </h2>
+            <div className="flex items-center gap-3">
+              <div
+                className="
+                  flex
+                  h-10
+                  w-10
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white/15
+                "
+              >
+                <MessageCircle size={21} />
+              </div>
 
-              <p className="text-xs text-green-100">
-                Always here to help
-              </p>
+              <div>
+                <h2 className="font-bold">
+                  Solarworks AI Assistant
+                </h2>
+
+                <p className="text-xs text-green-100">
+                  Ask us about solar energy
+                </p>
+              </div>
             </div>
 
             <button
+              type="button"
               onClick={() => setOpen(false)}
+              aria-label="Close chat"
               className="
-                ml-3
-                shrink-0
                 rounded-full
                 p-2
-                text-white
-                transition-colors
-                hover:bg-green-700
+                transition
+                hover:bg-white/15
               "
-              aria-label="Close chat"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* =================================================
-              MESSAGES AREA
+              MESSAGES
           ================================================= */}
 
           <div
             className="
               min-h-0
               flex-1
+              space-y-4
               overflow-y-auto
-              overflow-x-hidden
-              bg-gray-50
-              p-3
-              sm:p-4
-              space-y-3
-              sm:space-y-4
+              bg-slate-50
+              p-4
             "
           >
-            {messages.map((msg, i) => (
+            {messages.map((message, index) => (
               <div
-                key={i}
+                key={index}
                 className={`flex ${
-                  msg.type === "user"
+                  message.role === "user"
                     ? "justify-end"
                     : "justify-start"
                 }`}
               >
                 <div
-                  className={`
-                    max-w-[85%]
-                    sm:max-w-xs
-                    break-words
-                    px-3
-                    py-2.5
-                    sm:px-4
-                    sm:py-3
-                    rounded-lg
-                    ${
-                      msg.type === "user"
-                        ? "rounded-br-none bg-green-500 text-white"
-                        : "rounded-bl-none border border-gray-200 bg-white text-gray-800"
-                    }
-                  `}
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    message.role === "user"
+                      ? "rounded-br-sm bg-green-600 text-white"
+                      : "rounded-bl-sm border border-slate-200 bg-white text-slate-700 shadow-sm"
+                  }`}
                 >
-                  <p className="text-sm leading-relaxed">
-                    {msg.text}
-                  </p>
+                  {message.text}
                 </div>
               </div>
             ))}
 
-            {/* Loading indicator */}
+            {/* =================================================
+                LOADING INDICATOR
+            ================================================= */}
 
             {isLoading && (
               <div className="flex justify-start">
                 <div
                   className="
-                    rounded-lg
-                    rounded-bl-none
+                    rounded-2xl
+                    rounded-bl-sm
                     border
-                    border-gray-200
+                    border-slate-200
                     bg-white
                     px-4
                     py-3
+                    shadow-sm
                   "
                 >
-                  <div className="flex gap-2">
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
+                  <div className="flex items-center gap-1">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" />
 
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:100ms]" />
+                    <span
+                      className="h-2 w-2 animate-bounce rounded-full bg-slate-400"
+                      style={{
+                        animationDelay: "150ms",
+                      }}
+                    />
 
-                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:200ms]" />
+                    <span
+                      className="h-2 w-2 animate-bounce rounded-full bg-slate-400"
+                      style={{
+                        animationDelay: "300ms",
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -294,31 +328,39 @@ export default function ChatWidget() {
               className="
                 shrink-0
                 border-t
-                border-gray-200
+                border-slate-200
                 bg-white
                 px-3
-                py-2
-                sm:px-4
+                py-3
               "
             >
-              <p className="mb-2 text-xs text-gray-500">
-                Quick options:
+              <p className="mb-2 text-xs font-medium text-slate-500">
+                Quick questions
               </p>
 
-              <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
-                {quickReplies.map((reply, i) => (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {quickReplies.map((reply) => (
                   <button
-                    key={i}
-                    onClick={() => handleQuickReply(reply)}
+                    key={reply}
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(reply)
+                    }
                     className="
+                      shrink-0
                       rounded-full
-                      bg-gray-100
+                      border
+                      border-slate-200
+                      bg-slate-50
                       px-3
-                      py-1.5
+                      py-2
                       text-xs
-                      text-gray-700
-                      transition-colors
-                      hover:bg-gray-200
+                      font-medium
+                      text-slate-700
+                      transition
+                      hover:border-green-300
+                      hover:bg-green-50
+                      hover:text-green-700
                     "
                   >
                     {reply}
@@ -329,17 +371,16 @@ export default function ChatWidget() {
           )}
 
           {/* =================================================
-              INPUT AREA
+              INPUT
           ================================================= */}
 
           <div
             className="
               shrink-0
               border-t
-              border-gray-200
+              border-slate-200
               bg-white
               p-3
-              sm:p-4
             "
           >
             <div className="flex items-center gap-2">
@@ -352,48 +393,65 @@ export default function ChatWidget() {
                     handleSendMessage();
                   }
                 }}
-                placeholder="Type your question..."
+                placeholder="Ask about solar..."
+                disabled={isLoading}
                 className="
                   min-w-0
                   flex-1
-                  rounded-lg
+                  rounded-xl
                   border
-                  border-gray-300
-                  px-3
-                  py-2.5
+                  border-slate-300
+                  px-4
+                  py-3
                   text-sm
-                  text-gray-900
+                  text-slate-800
                   outline-none
                   transition
-                  placeholder:text-gray-400
+                  placeholder:text-slate-400
                   focus:border-green-500
-                  focus:ring-1
-                  focus:ring-green-300
+                  focus:ring-2
+                  focus:ring-green-100
+                  disabled:bg-slate-100
                 "
-                disabled={isLoading}
               />
 
               <button
-                onClick={handleSendMessage}
-                disabled={isLoading || !input.trim()}
+                type="button"
+                onClick={() => handleSendMessage()}
+                disabled={
+                  isLoading || !input.trim()
+                }
+                aria-label="Send message"
                 className="
+                  flex
+                  h-11
+                  w-11
                   shrink-0
-                  rounded-lg
-                  bg-green-500
-                  px-3
-                  py-2.5
-                  text-sm
-                  font-semibold
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-green-600
                   text-white
-                  transition-colors
-                  hover:bg-green-600
+                  transition
+                  hover:bg-green-700
                   disabled:cursor-not-allowed
-                  disabled:bg-gray-300
+                  disabled:bg-slate-300
                 "
               >
-                Send
+                <Send size={18} />
               </button>
             </div>
+
+            <p
+              className="
+                mt-2
+                text-center
+                text-[10px]
+                text-slate-400
+              "
+            >
+              Solarworks AI Assistant
+            </p>
           </div>
         </div>
       )}
