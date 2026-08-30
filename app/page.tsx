@@ -226,7 +226,7 @@ export default function HomePage() {
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-2 shadow-2xl">
 
               <img
-                src="/images/solarworks.jpg"
+                src="/images/solar1.png"
                 alt="Solar panel installation"
                 className="h-[360px] w-full rounded-2xl object-cover md:h-[480px]"
               />
